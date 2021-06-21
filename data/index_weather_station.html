@@ -1,0 +1,64 @@
+<!DOCTYPE HTML><html>
+<!-- Rui Santos - Complete project details at https://RandomNerdTutorials.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software. -->
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">  
+  <style>
+    body {
+      min-width: 310px;
+    	max-width: 800px;
+    	height: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      font-family: Arial;
+      font-size: 2.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>ESP Weather Station</h2>
+  <div>
+    <label>Refreshed: </label>
+    <label id="time">N/A</label>
+  </div>
+  <div>
+    <label>Pressure: </label>
+    <label id="pb">N/A</label>
+  </div>
+  <img src="logo" alt="Makerspace logo">
+</body>
+<script>
+
+function read_data(html_id, url) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime(),
+          y = this.responseText;
+      document.getElementById(html_id).innerHTML = y;
+    }
+  };
+  xhttp.open("GET", url, true);
+  xhttp.send();
+}
+
+function update_state() {
+  var time = new Date(); 
+  document.getElementById("time").innerHTML = time.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");;
+  read_data("pb", "/pressure")
+}
+
+update_state();
+
+setInterval(function ( ) {
+  update_state();
+}, 5000 ) ;
+
+</script>
+</html>

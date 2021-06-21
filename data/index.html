@@ -1,64 +1,102 @@
-<!DOCTYPE HTML><html>
-<!-- Rui Santos - Complete project details at https://RandomNerdTutorials.com
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files.
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software. -->
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">  
-  <style>
-    body {
-      min-width: 310px;
-    	max-width: 800px;
-    	height: 400px;
-      margin: 0 auto;
-    }
-    h2 {
-      font-family: Arial;
-      font-size: 2.5rem;
-      text-align: center;
-    }
-  </style>
+    <title>MFM controller</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <script src="jquery-3.5.1.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <style type="text/css">
+        .indicator {
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 10px;
+            margin-right: 10px;
+            border: 3px solid #ffe404;
+        }
+        .indicator-full {
+            background-color: #ffe404;
+        }
+        .indicator-empty {
+            background-color: #fff;
+        }
+        .liquid-empty {
+            background-color: #ff3333;
+        }
+        .liquid-full {
+            background-color: #36ff43;
+        }
+        .manual-btn {
+            height: 60px;
+            width: 120px;
+            font-size: 20px;
+        }
+    </style>
 </head>
+
 <body>
-  <h2>ESP Weather Station</h2>
-  <div>
-    <label>Refreshed: </label>
-    <label id="time">N/A</label>
-  </div>
-  <div>
-    <label>Pressure: </label>
-    <label id="pb">N/A</label>
-  </div>
-  <img src="logo" alt="Makerspace logo">
+<div class="container-fluid pt-3" style="padding-left: 10%; padding-right: 10%">
+    <table width="60%" style="margin-left: auto; margin-right: auto;"><tr>
+    <td><img width="50px" src="logo.png"></td>
+    <td style="padding-left: 15px"><div style="font-size: 20px; line-height: 20px"><b>Monster Fog Machine</b></div></td>
+    </tr></table>
+    <br/>
+    <center>
+        <span id="ind-1" class="indicator indicator-empty"></span>
+        <span id="ind-2" class="indicator indicator-full"></span>
+        <span id="ind-3" class="indicator indicator-empty"></span>
+        <div style="font-size: 20px">Liquid status: <span class="liquid-full" style="padding: 0px 10px 3px 10px"><b>FULL</b></span></div>
+    </center>
+    <br/><br/>
+
+<div>
+    <ul class="nav nav-tabs nav-justified" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="false">Manual</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="automatic-tab" data-toggle="tab" href="#automatic" role="tab" aria-controls="automatic" aria-selected="true">Automatic</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="help-tab" data-toggle="tab" href="#help" role="tab" aria-controls="help" aria-selected="false">Help</a>
+        </li>
+    </ul>
+    
+    <div class="tab-content">
+        <div class="tab-pane fade" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+            <center><button type="button" class="btn btn-primary manual-btn mt-5"><b>SPRAY</b></button></center>
+        </div>
+        
+        <div class="tab-pane fade show active" id="automatic" role="tabpanel" aria-labelledby="automatic-tab">
+            <div class="mt-4">
+                <form>
+                    <div class="form-group row">
+                        <label for="time-bfr-spray" class="col-7 col-form-label">Time bfr spray (mins):</label>
+                        <div class="col-5">
+                            <input type="number" class="form-control" id="time-bfr-spray" min="5" step="1" value="5">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="spray-time" class="col-7 col-form-label">Spray time (secs):</label>
+                        <div class="col-5">
+                            <input type="number" class="form-control" id="spray-time" value="15">
+                        </div>
+                    </div>
+                    <center><button type="button" id="automatic-btn" class="btn btn-primary manual-btn mt-4"><b>START</b></button></center>
+                </form>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="help-tab">
+            dsadadasds
+        </div>
+    </div>
+</div>
+
+
+</div>
 </body>
-<script>
-
-function read_data(html_id, url) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var x = (new Date()).getTime(),
-          y = this.responseText;
-      document.getElementById(html_id).innerHTML = y;
-    }
-  };
-  xhttp.open("GET", url, true);
-  xhttp.send();
-}
-
-function update_state() {
-  var time = new Date(); 
-  document.getElementById("time").innerHTML = time.toTimeString().replace(/.*(\d{2}:\d{2}:\d{2}).*/, "$1");;
-  read_data("pb", "/pressure")
-}
-
-update_state();
-
-setInterval(function ( ) {
-  update_state();
-}, 5000 ) ;
-
-</script>
-</html>
