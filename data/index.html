@@ -129,11 +129,11 @@
 
     var modeStatus = "none";
 
-    function getData(url) {
+    function getData(url, callback) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
-                return this.responseText;
+                callback && callback(this.responseText)
             }
         };
         xhttp.open("GET", url, true);
@@ -153,7 +153,7 @@
             timeBfrSpray.disabled = true;
             sprayTime.disabled = true;
             autoBtn.disabled = true;
-            //getData("/start-manual");
+            getData("/start-manual");
             this.modeStatus = "manual";
         } else if (this.modeStatus == "manual") {
             manualBtn.innerHTML = "<b>SPRAY</b>";
@@ -162,7 +162,7 @@
             timeBfrSpray.disabled = false;
             sprayTime.disabled = false;
             autoBtn.disabled = false;
-            //getData("/stop-manual");
+            getData("/stop-manual");
             this.modeStatus = "none";
         }
     }
@@ -244,22 +244,25 @@
        
     function procHeaterStatus() {
         for (var i = 1; i < 4; i++) {
-            //var heaterStatus = getData("/heater-status?sensor="+i); // atsakymas true jei užkaites, false jei kaista
-            var heaterStatus = "true";
-            var heaterInd = document.getElementById("ind-"+i);
-            if (heaterStatus == "true") {
-                heaterInd.classList.remove("indicator-full");
-                heaterInd.classList.add("indicator-empty");
-            } else {
-                heaterInd.classList.remove("indicator-empty");
-                heaterInd.classList.add("indicator-full");
-            }
+            getData("/heater-status?sensor="+i, function(heaterStatus) {
+                // atsakymas true jei užkaites, false jei kaista
+                // var heaterStatus = "true";
+                console.log(heaterStatus);
+                var heaterInd = document.getElementById("ind-"+i);
+                if (heaterStatus == "true") {
+                    heaterInd.classList.remove("indicator-full");
+                    heaterInd.classList.add("indicator-empty");
+                } else {
+                    heaterInd.classList.remove("indicator-empty");
+                    heaterInd.classList.add("indicator-full");
+                }
+            }); 
         }
     }
 
     function procLiquidStatus() {
-        //var liquidStatus = (getData("/liquid-status") == "true"); // atsakymas true jei yra skysčio, false jei nėra
-        var liquidStatus = true;
+        var liquidStatus = (getData("/liquid-status") == "true"); // atsakymas true jei yra skysčio, false jei nėra
+        //var liquidStatus = true;
         var liquidInd = document.getElementById("liq-stat");
         if (liquidStatus) {
             liquidInd.classList.remove("liquid-empty");

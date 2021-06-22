@@ -43,12 +43,12 @@ void updateFogMachineState() {
 
 void start_machine() {
     digitalWrite(MACHINE_CONTROL_RELAY_PIN, HIGH);
-    Serial.println("STARTED");
+    //Serial.println("STARTED");
 }
 
 void stop_machine() {
     digitalWrite(MACHINE_CONTROL_RELAY_PIN, LOW);
-    Serial.println("STOPPED");
+    //Serial.println("STOPPED");
 }
 
 void control_loop() {
