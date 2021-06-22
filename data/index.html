@@ -233,7 +233,7 @@
        
     function procHeaterStatus() {
         for (var i = 1; i < 4; i++) {
-            //var heaterStatus = getData("/heater-status-"+i); // atsakymas true jei užkaites, false jei kaista
+            //var heaterStatus = getData("/heater-status?sensor="+i); // atsakymas true jei užkaites, false jei kaista
             var heaterStatus = "true";
             var heaterInd = document.getElementById("ind-"+i);
             if (heaterStatus == "true") {
