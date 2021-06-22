@@ -25,7 +25,7 @@
             background-color: #fff;
         }
         .liquid-empty {
-            background-color: #ff3333;
+            background-color: #ff5959;
         }
         .liquid-full {
             background-color: #36ff43;
@@ -39,80 +39,250 @@
 </head>
 
 <body>
-<div class="container-fluid pt-3" style="padding-left: 10%; padding-right: 10%">
-    <table width="60%" style="margin-left: auto; margin-right: auto;"><tr>
-    <td><img width="50px" src="logo.png"></td>
-    <td style="padding-left: 15px"><div style="font-size: 20px; line-height: 20px"><b>Monster Fog Machine</b></div></td>
-    </tr></table>
-    <br/>
-    <center>
-        <span id="ind-1" class="indicator indicator-empty"></span>
-        <span id="ind-2" class="indicator indicator-full"></span>
-        <span id="ind-3" class="indicator indicator-empty"></span>
-        <div style="font-size: 20px">Liquid status: <span class="liquid-full" style="padding: 0px 10px 3px 10px"><b>FULL</b></span></div>
-    </center>
-    <br/><br/>
+    <div class="container-fluid pt-3" style="padding-left: 10%; padding-right: 10%">
+        <table width="60%" style="margin-left: auto; margin-right: auto;"><tr>
+        <td><img width="50px" src="logo.png"></td>
+        <td style="padding-left: 15px"><div style="font-size: 20px; line-height: 20px"><b>Monster Fog Machine</b></div></td>
+        </tr></table>
+        <br/>
+        <center>
+            <span id="ind-1" class="indicator indicator-empty"></span>
+            <span id="ind-2" class="indicator indicator-full"></span>
+            <span id="ind-3" class="indicator indicator-empty"></span>
+            <div style="font-size: 20px">Liquid status: <span id="liq-stat" class="liquid-full" style="padding: 0px 10px 3px 10px">GOOD</span></div>
+        </center>
+        <br/><br/>
 
-<div>
-    <ul class="nav nav-tabs nav-justified" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Manual</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="automatic-tab" data-toggle="tab" href="#automatic" role="tab" aria-controls="automatic" aria-selected="false">Automatic</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="help-tab" data-toggle="tab" href="#help" role="tab" aria-controls="help" aria-selected="false">Help</a>
-        </li>
-    </ul>
-    
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
-            <center><button type="button" class="btn btn-primary manual-btn mt-5 mb-5"><b>SPRAY</b></button></center>
-        </div>
-        
-        <div class="tab-pane fade" id="automatic" role="tabpanel" aria-labelledby="automatic-tab">
-            <div class="mt-4">
-                <form>
-                    <div class="form-group row">
-                        <label for="time-bfr-spray" class="col-7 col-form-label">Time bfr spray (mins):</label>
-                        <div class="col-5">
-                            <input type="number" class="form-control" id="time-bfr-spray" min="5" step="1" value="5">
-                        </div>
+        <div>
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="manual-tab" data-toggle="tab" href="#manual" role="tab" aria-controls="manual" aria-selected="true">Manual</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="automatic-tab" data-toggle="tab" href="#automatic" role="tab" aria-controls="automatic" aria-selected="false">Automatic</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="help-tab" data-toggle="tab" href="#help" role="tab" aria-controls="help" aria-selected="false">Help</a>
+                </li>
+            </ul>
+            
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="manual" role="tabpanel" aria-labelledby="manual-tab">
+                    <center><button type="button" id="manual-btn" class="btn btn-primary manual-btn mt-5 mb-5" onclick="manageManual()"><b>SPRAY</b></button></center>
+                </div>
+                
+                <div class="tab-pane fade" id="automatic" role="tabpanel" aria-labelledby="automatic-tab">
+                    <div class="mt-4">
+                        <form>
+                            <div class="form-group row">
+                                <label for="time-bfr-spray" class="col-7 col-form-label">Time bfr spray (mins):</label>
+                                <div class="col-5">
+                                    <input type="number" class="form-control" id="time-bfr-spray" min="5" step="1" value="5">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="spray-time" class="col-7 col-form-label">Spray time (secs):</label>
+                                <div class="col-5">
+                                    <input type="number" class="form-control" id="spray-time" value="15">
+                                </div>
+                            </div>
+                            <center><button type="button" id="automatic-btn" class="btn btn-primary manual-btn mt-4 mb-5" onclick="manageAuto()"><b>START</b></button></center>
+                        </form>
                     </div>
-                    <div class="form-group row">
-                        <label for="spray-time" class="col-7 col-form-label">Spray time (secs):</label>
-                        <div class="col-5">
-                            <input type="number" class="form-control" id="spray-time" value="15">
-                        </div>
+                </div>
+                
+                <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="help-tab">
+                    <div class="mt-3">
+                        Below the logo and title are three yellow circles - they indicate the <i>status</i> of heating blocks.<br/>
+                        <i>Filled</i> means they are heating and not ready to use, while <i>empty</i> means they are ready.<br/>
+                        <br/>
+                        Below yellow circles is the liquid status. It shows when the tank needs re-filling by displaying <i>FULL</i> when there is enough liquid and <i>EMPTY</i> when you need to re-fill.<br/>
+                        When the status changes to <i>EMPTY</i>, start buttons are disabled to prevent sucking in air.<br/>
+                        <br/>
+                        Below the liquid status there are three tabs:<br/>
+                        <ul>
+                            <li><b>Manual</b> - there is only one toggle button here and it's to start and stop the machine when there is enough liquid. Once pressed, the machine will start spraying smoke <i>until you stop it or liquid runs out or the heating blocks change status to filled</i>.</li>
+                            <li><b>Automatic</b> - here you can set the machine to spray for you by setting the required parameters and pressing start.<br/>
+                            <i>Time before start</i> means that the machine will wait this many minutes before each repetition.<br/>
+                            <i>Spray time</i> means that the machine will spray for this many secods or until heating blocks change status to filled.<br/>
+                            The start button runs the process and it will repeat until the liquid runs out, after which the process stops.</li>
+                            <li><b>Help</b> - obviously it's this help page :)
+                        <ul>
                     </div>
-                    <center><button type="button" id="automatic-btn" class="btn btn-primary manual-btn mt-4 mb-5"><b>START</b></button></center>
-                </form>
-            </div>
-        </div>
-        
-        <div class="tab-pane fade" id="help" role="tabpanel" aria-labelledby="help-tab">
-            <div class="mt-3">
-                Below the logo and title are three yellow circles - they indicate the <i>status</i> of heating blocks.<br/>
-                <i>Filled</i> means they are heating and not ready to use, while <i>empty</i> means they are ready.<br/>
-                <br/>
-                Below yellow circles is the liquid status. It shows when the tank needs re-filling by displaying <i>FULL</i> when there is enough liquid and <i>EMPTY</i> when you need to re-fill.<br/>
-                When the status changes to <i>EMPTY</i>, start buttons are disabled to prevent sucking in air.<br/>
-                <br/>
-                Below the liquid status there are three tabs:<br/>
-                <ul>
-                    <li><b>Manual</b> - there is only one toggle button here and it's to start and stop the machine when there is enough liquid. Once pressed, the machine will start spraying smoke <i>until you stop it or liquid runs out or the heating blocks change status to filled</i>.</li>
-                    <li><b>Automatic</b> - here you can set the machine to spray for you by setting the required parameters and pressing start.<br/>
-                    <i>Time before start</i> means that the machine will wait this many minutes before each repetition.<br/>
-                    <i>Spray time</i> means that the machine will spray for this many secods or until heating blocks change status to filled.<br/>
-                    The start button runs the process and it will repeat until the liquid runs out, after which the process stops.</li>
-                    <li><b>Help</b> - obviously it's this help page :)
-                <ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-
-</div>
 </body>
+<script>
+    var modeStatus = "none";
+
+    function getData(url) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+                return this.responseText;
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
+    }
+
+    function manageManual() {
+        var manualBtn = document.getElementById("manual-btn");
+        var timeBfrSpray = document.getElementById("time-bfr-spray");
+        var sprayTime = document.getElementById("spray-time");
+        var autoBtn = document.getElementById("automatic-btn");
+        if (this.modeStatus == "none") {
+            //getData("/stop-automatic");
+            manualBtn.innerHTML = "<b>STOP</b>";
+            manualBtn.classList.remove("btn-primary");
+            manualBtn.classList.add("btn-danger");
+            timeBfrSpray.disabled = true;
+            sprayTime.disabled = true;
+            autoBtn.disabled = true;
+            //getData("/start-manual");
+            this.modeStatus = "manual";
+        } else if (this.modeStatus == "manual") {
+            manualBtn.innerHTML = "<b>SPRAY</b>";
+            manualBtn.classList.remove("btn-danger");
+            manualBtn.classList.add("btn-primary");
+            timeBfrSpray.disabled = false;
+            sprayTime.disabled = false;
+            autoBtn.disabled = false;
+            //getData("/stop-manual");
+            this.modeStatus = "none";
+        }
+    }
+    
+    function manageAuto() {
+        var manualBtn = document.getElementById("manual-btn");
+        var timeBfrSpray = document.getElementById("time-bfr-spray");
+        var sprayTime = document.getElementById("spray-time");
+        var autoBtn = document.getElementById("automatic-btn");
+        if (this.modeStatus == "none") {
+            var timeBfrSprayVal = timeBfrSpray.value;
+            var sprayTimeVal = sprayTime.value;
+            if ((timeBfrSprayVal <= 0) || (sprayTimeVal <= 0)) {
+                alert("Wrong time values entered!");
+                return;
+            }
+            manualBtn.disabled = true;
+            timeBfrSpray.disabled = true;
+            sprayTime.disabled = true;
+            autoBtn.innerHTML = "<b>STOP</b>";
+            autoBtn.classList.remove("btn-primary");
+            autoBtn.classList.add("btn-danger");
+            //getData("/start-auto?timeBfrSpray="+timeBfrSpray.value+"&sprayTime="+sprayTime.value);
+            this.modeStatus = "auto";
+        } else if (this.modeStatus == "auto") {
+            manualBtn.disabled = false;
+            timeBfrSpray.disabled = false;
+            sprayTime.disabled = false;
+            autoBtn.innerHTML = "<b>START</b>";
+            autoBtn.classList.remove("btn-danger");
+            autoBtn.classList.add("btn-primary");
+            //getData("/stop-auto");
+            this.modeStatus = "none";
+        }
+    }
+
+    function procModeStatus() {
+        //this.modeStatus = getData("/mode-status"); // atsakymai manual, automatic arba none jei nepaleista niekas
+        this.modeStatus = "none";
+        var manualBtn = document.getElementById("manual-btn");
+        var timeBfrSpray = document.getElementById("time-bfr-spray");
+        var sprayTime = document.getElementById("spray-time");
+        var autoBtn = document.getElementById("automatic-btn");
+        if (this.modeStatus == "manual") {
+            manualBtn.disabled = false;
+            timeBfrSpray.disabled = true;
+            sprayTime.disabled = true;
+            autoBtn.disabled = true;
+            manualBtn.innerHTML = "<b>STOP</b>";
+            manualBtn.classList.remove("btn-primary");
+            manualBtn.classList.add("btn-danger");
+        } else if (this.modeStatus == "auto") {
+            manualBtn.disabled = true;
+            timeBfrSpray.disabled = true;
+            sprayTime.disabled = true;
+            autoBtn.disabled = false;
+            autoBtn.innerHTML = "<b>STOP</b>";
+            autoBtn.classList.remove("btn-primary");
+            autoBtn.classList.add("btn-danger");
+        } else {
+            manualBtn.disabled = false;
+            timeBfrSpray.disabled = false;
+            sprayTime.disabled = false;
+            autoBtn.disabled = false;
+            manualBtn.innerHTML = "<b>SPRAY</b>";
+            manualBtn.classList.remove("btn-danger");
+            manualBtn.classList.add("btn-primary");
+            autoBtn.innerHTML = "<b>START</b>";
+            autoBtn.classList.remove("btn-danger");
+            autoBtn.classList.add("btn-primary");
+        }
+    }
+
+    function stopModes() {
+        // atsakymo gali ir nebūti
+        //getData("/stop-manual");
+        //getData("/stop-auto");
+    }
+       
+    function procHeaterStatus() {
+        for (var i = 1; i < 4; i++) {
+            //var heaterStatus = getData("/heater-status-"+i); // atsakymas true jei užkaites, false jei kaista
+            var heaterStatus = "true";
+            var heaterInd = document.getElementById("ind-"+i);
+            if (heaterStatus == "true") {
+                heaterInd.classList.remove("indicator-full");
+                heaterInd.classList.add("indicator-empty");
+            } else {
+                heaterInd.classList.remove("indicator-empty");
+                heaterInd.classList.add("indicator-full");
+            }
+        }
+    }
+
+    function procLiquidStatus() {
+        //var liquidStatus = (getData("/liquid-status") == "true"); // atsakymas true jei yra skysčio, false jei nėra
+        var liquidStatus = true;
+        var liquidInd = document.getElementById("liq-stat");
+        if (liquidStatus) {
+            liquidInd.classList.remove("liquid-empty");
+            liquidInd.classList.add("liquid-full");
+            liquidInd.innerHTML = "<b>GOOD</b>";
+        } else {
+            liquidInd.classList.remove("liquid-full");
+            liquidInd.classList.add("liquid-empty");
+            liquidInd.innerHTML = "<b>EMPTY</b>";
+            stopModes();
+        }
+        document.getElementById("manual-btn").disabled = !liquidStatus;
+        document.getElementById("time-bfr-spray").disabled = !liquidStatus;
+        document.getElementById("spray-time").disabled = !liquidStatus;
+        document.getElementById("automatic-btn").disabled = !liquidStatus;
+    }
+    
+    function initPage() {
+        procModeStatus();
+        procHeaterStatus();
+        procLiquidStatus();
+    }
+    
+    initPage();
+    
+    /*setInterval(function () {
+        procModeStatus();
+    }, 5000);
+    
+    setInterval(function () {
+        procHeaterStatus();
+    }, 5000);
+    
+    setInterval(function () {
+        procLiquidStatus();
+    }, 5000);*/
+</script>
+</html>
