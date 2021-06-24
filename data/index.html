@@ -244,19 +244,21 @@
        
     function procHeaterStatus() {
         for (var i = 1; i < 4; i++) {
-            getData("/heater-status?sensor="+i, function(heaterStatus) {
-                // atsakymas true jei užkaites, false jei kaista
-                // var heaterStatus = "true";
-                console.log(heaterStatus);
-                var heaterInd = document.getElementById("ind-"+i);
-                if (heaterStatus == "true") {
-                    heaterInd.classList.remove("indicator-full");
-                    heaterInd.classList.add("indicator-empty");
-                } else {
-                    heaterInd.classList.remove("indicator-empty");
-                    heaterInd.classList.add("indicator-full");
-                }
-            }); 
+            (function(i) {
+                getData("/heater-status?sensor="+i, function(heaterStatus) {
+                    // atsakymas true jei užkaites, false jei kaista
+                    // var heaterStatus = "true";
+                    console.log("heaterStatus => "+heaterStatus);
+                    var heaterInd = document.getElementById("ind-"+i);
+                    if (heaterStatus == "true") {
+                        heaterInd.classList.remove("indicator-full");
+                        heaterInd.classList.add("indicator-empty");
+                    } else {
+                        heaterInd.classList.remove("indicator-empty");
+                        heaterInd.classList.add("indicator-full");
+                    }
+                });
+            })(i);
         }
     }
 
