@@ -263,23 +263,28 @@
     }
 
     function procLiquidStatus() {
-        var liquidStatus = (getData("/liquid-status") == "true"); // atsakymas true jei yra skysčio, false jei nėra
-        //var liquidStatus = true;
-        var liquidInd = document.getElementById("liq-stat");
-        if (liquidStatus) {
-            liquidInd.classList.remove("liquid-empty");
-            liquidInd.classList.add("liquid-full");
-            liquidInd.innerHTML = "<b>GOOD</b>";
-        } else {
-            liquidInd.classList.remove("liquid-full");
-            liquidInd.classList.add("liquid-empty");
-            liquidInd.innerHTML = "<b>EMPTY</b>";
-            stopModes();
-        }
-        document.getElementById("manual-btn").disabled = !liquidStatus;
-        document.getElementById("time-bfr-spray").disabled = !liquidStatus;
-        document.getElementById("spray-time").disabled = !liquidStatus;
-        document.getElementById("automatic-btn").disabled = !liquidStatus;
+        getData("/liquid-status", function(status) {
+            // response: true if there is liquid, false if empty
+            //var liquidStatus = true;
+            console.log("liquidStatus => "+status);
+            var liquidInd = document.getElementById("liq-stat");
+            var liquidStatus = (status == "true");
+            if (liquidStatus) {
+                liquidInd.classList.remove("liquid-empty");
+                liquidInd.classList.add("liquid-full");
+                liquidInd.innerHTML = "<b>GOOD</b>";
+            } else {
+                liquidInd.classList.remove("liquid-full");
+                liquidInd.classList.add("liquid-empty");
+                liquidInd.innerHTML = "<b>EMPTY</b>";
+                stopModes();
+            }
+            document.getElementById("manual-btn").disabled = !liquidStatus;
+            document.getElementById("time-bfr-spray").disabled = !liquidStatus;
+            document.getElementById("spray-time").disabled = !liquidStatus;
+            document.getElementById("automatic-btn").disabled = !liquidStatus;
+        });
+        
     }
     
     function initPage() {
