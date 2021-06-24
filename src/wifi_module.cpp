@@ -1,11 +1,15 @@
-
 #include <Arduino.h>
 
 #include <WiFi.h>
+#include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
 
 #include <wifi_module.h>
+
+const byte DNS_PORT = 53;
+IPAddress apIP(192,168,4,1); // The default android DNS
+DNSServer dnsServer;
 
 // Set web server port number to 80
 AsyncWebServer server(80);
@@ -16,7 +20,24 @@ String header;
 
 String get_current_pressure_reading_bar();
 
+class CaptiveRequestHandler : public AsyncWebHandler {
+public:
+  CaptiveRequestHandler() {}
+  virtual ~CaptiveRequestHandler() {}
+
+  bool canHandle(AsyncWebServerRequest *request){
+    //request->addInterestingHeader("ANY");
+    return true;
+  }
+
+  void handleRequest(AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/index.html");
+  }
+};
+
 void setup_wifi_module() {
+
+  
 
   // Initialize SPIFFS
   if(!SPIFFS.begin()){
@@ -24,6 +45,7 @@ void setup_wifi_module() {
   }
 
     Serial.println("Setting AP (Access Point)…");
+    WiFi.mode(WIFI_AP); 
     WiFi.softAP("KMS - Monster fog machine");
 
     IPAddress IP = WiFi.softAPIP();
@@ -104,7 +126,18 @@ void setup_wifi_module() {
       request->send(response);
     });
 
+// replay to all requests with same HTML
+  server.onNotFound([](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/index.html");
+  });
+
+  dnsServer.start(53, "*", WiFi.softAPIP());
+  server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);//only when requested from AP
   server.begin();
+}
+
+void handleRequests() {
+  dnsServer.processNextRequest();
 }
 
 String generate_reading() {
