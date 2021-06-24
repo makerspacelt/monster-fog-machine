@@ -110,7 +110,7 @@ void setup_wifi_module() {
 
     server.on("/mode-status", HTTP_GET, [](AsyncWebServerRequest *request) {
         String currMode;
-        int tmp = 1;
+        int tmp = 3;
         if (tmp == 1) {
             currMode = "none";
         } else if (tmp == 2) {

@@ -200,40 +200,44 @@
     }
 
     function procModeStatus() {
-        //this.modeStatus = getData("/mode-status"); // atsakymai manual, automatic arba none jei nepaleista niekas
-        this.modeStatus = "none";
-        var manualBtn = document.getElementById("manual-btn");
-        var timeBfrSpray = document.getElementById("time-bfr-spray");
-        var sprayTime = document.getElementById("spray-time");
-        var autoBtn = document.getElementById("automatic-btn");
-        if (this.modeStatus == "manual") {
-            manualBtn.disabled = false;
-            timeBfrSpray.disabled = true;
-            sprayTime.disabled = true;
-            autoBtn.disabled = true;
-            manualBtn.innerHTML = "<b>STOP</b>";
-            manualBtn.classList.remove("btn-primary");
-            manualBtn.classList.add("btn-danger");
-        } else if (this.modeStatus == "auto") {
-            manualBtn.disabled = true;
-            timeBfrSpray.disabled = true;
-            sprayTime.disabled = true;
-            autoBtn.disabled = false;
-            autoBtn.innerHTML = "<b>STOP</b>";
-            autoBtn.classList.remove("btn-primary");
-            autoBtn.classList.add("btn-danger");
-        } else {
-            manualBtn.disabled = false;
-            timeBfrSpray.disabled = false;
-            sprayTime.disabled = false;
-            autoBtn.disabled = false;
-            manualBtn.innerHTML = "<b>SPRAY</b>";
-            manualBtn.classList.remove("btn-danger");
-            manualBtn.classList.add("btn-primary");
-            autoBtn.innerHTML = "<b>START</b>";
-            autoBtn.classList.remove("btn-danger");
-            autoBtn.classList.add("btn-primary");
-        }
+        getData("/mode-status", function(modeStatus) {
+            // response: manual, automatic or none if nothing was started
+            // this.modeStatus = "none";
+            console.log("modeStatus => "+modeStatus);
+            this.modeStatus = modeStatus;
+            var manualBtn = document.getElementById("manual-btn");
+            var timeBfrSpray = document.getElementById("time-bfr-spray");
+            var sprayTime = document.getElementById("spray-time");
+            var autoBtn = document.getElementById("automatic-btn");
+            if (this.modeStatus == "manual") {
+                manualBtn.disabled = false;
+                timeBfrSpray.disabled = true;
+                sprayTime.disabled = true;
+                autoBtn.disabled = true;
+                manualBtn.innerHTML = "<b>STOP</b>";
+                manualBtn.classList.remove("btn-primary");
+                manualBtn.classList.add("btn-danger");
+            } else if (this.modeStatus == "auto") {
+                manualBtn.disabled = true;
+                timeBfrSpray.disabled = true;
+                sprayTime.disabled = true;
+                autoBtn.disabled = false;
+                autoBtn.innerHTML = "<b>STOP</b>";
+                autoBtn.classList.remove("btn-primary");
+                autoBtn.classList.add("btn-danger");
+            } else {
+                manualBtn.disabled = false;
+                timeBfrSpray.disabled = false;
+                sprayTime.disabled = false;
+                autoBtn.disabled = false;
+                manualBtn.innerHTML = "<b>SPRAY</b>";
+                manualBtn.classList.remove("btn-danger");
+                manualBtn.classList.add("btn-primary");
+                autoBtn.innerHTML = "<b>START</b>";
+                autoBtn.classList.remove("btn-danger");
+                autoBtn.classList.add("btn-primary");
+            }
+        });
     }
 
     function stopModes() {
