@@ -115,7 +115,7 @@ void control_loop() {
             // Variables are resetted in the next control loop
             controlMode = CONTROL_MODE_NONE;
         }
-    } if (controlMode == CONTROL_MODE_AUTO) {
+    } if (controlMode == CONTROL_MODE_MANUAL) {
         // Activates machine
         // State validation is already performed at this point
         start_machine();

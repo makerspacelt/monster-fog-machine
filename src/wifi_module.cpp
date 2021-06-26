@@ -91,9 +91,8 @@ void setup_wifi_module() {
         if (request->hasParam("sprayTime")) {
             String paramStr = request->getParam("sprayTime")->value();
             float sprayTime = atof(paramStr.c_str());
-            activationTime = sprayTime * 60 * 1000;
+            activationTime = sprayTime * 1000;
         }
-        
         request->send(200, "text/plain", "OK");
     });
 
@@ -127,6 +126,7 @@ void setup_wifi_module() {
     server.on("/liquid-status", HTTP_GET, [](AsyncWebServerRequest *request) {
         AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
         response->addHeader("Access-Control-Allow-Origin", "*");
+
         request->send(response);
     });
 

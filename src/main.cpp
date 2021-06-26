@@ -14,5 +14,5 @@ void loop() {
     handleRequests();
     control_loop();
 
-    //delay(100);
+    delay(100);
 }
