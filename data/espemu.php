@@ -40,17 +40,7 @@ function do_stopManual() {
 
 function do_startAuto() {
     // response: true if started, false if not
-    $params = explode('?', $_GET['f']);
-    if (count($params) > 1) {
-        $sensorVal = explode('=', trim($params[1]));
-        if ((count($sensorVal) > 1) && ($sensorVal[1] != '')) {
-            echo (rand(0, 1) == 0 ? 'false' : 'true');
-        } else {
-            echo 'no sensor value';
-        }
-    } else {
-        echo 'no sensor param';
-    }
+    print_r($_GET);
 }
 
 function do_stopAuto() {

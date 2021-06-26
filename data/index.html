@@ -136,7 +136,9 @@
                 callback && callback(this.responseText)
             }
         };
-        xhttp.open("GET", 'espemu.php?f='+url, true);
+        url = url.replace("?", "&");
+        url = 'espemu.php?f='+url;
+        xhttp.open("GET", url, true);
         xhttp.send();
     }
 
