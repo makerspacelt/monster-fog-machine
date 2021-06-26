@@ -47,7 +47,7 @@
         <br/>
         <center>
             <span id="ind-1" class="indicator indicator-empty"></span>
-            <span id="ind-2" class="indicator indicator-full"></span>
+            <span id="ind-2" class="indicator indicator-empty"></span>
             <span id="ind-3" class="indicator indicator-empty"></span>
             <div style="font-size: 20px">Liquid status: <span id="liq-stat" class="liquid-full" style="padding: 0px 10px 3px 10px"><b>GOOD</b></span></div>
         </center>
@@ -136,7 +136,7 @@
                 callback && callback(this.responseText)
             }
         };
-        xhttp.open("GET", url, true);
+        xhttp.open("GET", 'espemu.php?f='+url, true);
         xhttp.send();
     }
 
