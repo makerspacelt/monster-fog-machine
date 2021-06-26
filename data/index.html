@@ -148,7 +148,7 @@
         var sprayTime = document.getElementById("spray-time");
         var autoBtn = document.getElementById("automatic-btn");
         if (this.modeStatus == "none") {
-            //getData("/stop-automatic");
+            getData("/stop-automatic");
             manualBtn.innerHTML = "<b>STOP</b>";
             manualBtn.classList.remove("btn-primary");
             manualBtn.classList.add("btn-danger");
@@ -187,7 +187,7 @@
             autoBtn.innerHTML = "<b>STOP</b>";
             autoBtn.classList.remove("btn-primary");
             autoBtn.classList.add("btn-danger");
-            //getData("/start-auto?timeBfrSpray="+timeBfrSpray.value+"&sprayTime="+sprayTime.value);
+            getData("/start-auto?timeBfrSpray="+timeBfrSpray.value+"&sprayTime="+sprayTime.value);
             this.modeStatus = "auto";
         } else if (this.modeStatus == "auto") {
             manualBtn.disabled = false;
@@ -196,7 +196,7 @@
             autoBtn.innerHTML = "<b>START</b>";
             autoBtn.classList.remove("btn-danger");
             autoBtn.classList.add("btn-primary");
-            //getData("/stop-auto");
+            getData("/stop-auto");
             this.modeStatus = "none";
         }
     }
@@ -244,8 +244,8 @@
 
     function stopModes() {
         // atsakymo gali ir nebūti
-        //getData("/stop-manual");
-        //getData("/stop-auto");
+        getData("/stop-manual");
+        getData("/stop-auto");
     }
        
     function procHeaterStatus() {

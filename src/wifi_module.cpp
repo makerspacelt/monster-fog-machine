@@ -3,7 +3,9 @@
 #include <DNSServer.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFS.h>
+
 #include <wifi_module.h>
+#include <control.h>
 
 #define SSID "KMS - Monster fog machine"
 
@@ -38,7 +40,7 @@ void setup_wifi_module() {
     Serial.print("AP IP address: ");
     Serial.println(WiFi.softAPIP());
 
-    //------------------------------------------------------------
+    //---------------------UI RELATED METHOD--------------------------
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html");
     });
@@ -62,60 +64,79 @@ void setup_wifi_module() {
     server.on("/favicon-16x16.png", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/favicon-16x16.png", "image/png");
     });
-    //------------------------------------------------------------
+    //--------------------CONTROL METHODS-----------------------------
     server.on("/start-manual", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("MANUAL_START");
+        Serial.println("Manual control mode started");
+        controlMode = CONTROL_MODE_MANUAL;
+
         request->send(200, "text/plain", "OK");
     });
 
     server.on("/stop-manual", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("MANUAL_STOP");
+        Serial.println("Manual control mode stopped");
+        controlMode = CONTROL_MODE_NONE;
+
         request->send(200, "text/plain", "OK");
     });
 
     server.on("/start-auto", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("AUTO_START");
+        Serial.println("Automatic control mode started");
+        controlMode = CONTROL_MODE_AUTO;
+        
+        if (request->hasParam("timeBfrSpray")) {
+            String paramStr = request->getParam("timeBfrSpray")->value();
+            float timeBfrSpray = atof(paramStr.c_str());
+            waitingTime = timeBfrSpray * 60 * 1000;
+        }
+        if (request->hasParam("sprayTime")) {
+            String paramStr = request->getParam("sprayTime")->value();
+            float sprayTime = atof(paramStr.c_str());
+            activationTime = sprayTime * 60 * 1000;
+        }
+        
         request->send(200, "text/plain", "OK");
     });
 
     server.on("/stop-auto", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("AUTO_STOP");
+        Serial.println("Automatic control mode stopped");
+        controlMode = CONTROL_MODE_NONE;
+
         request->send(200, "text/plain", "OK");
     });
 
     server.on("/heater-status", HTTP_GET, [](AsyncWebServerRequest *request) {
-        String heaterState;
+        bool heaterState = false;
         if (request->hasParam("sensor")) {
             String sensorNrStr = request->getParam("sensor")->value();
             int sensorNr = atoi(sensorNrStr.c_str());
+            
             if (sensorNr == 1) {
-                heaterState = "false";
+                heaterState = heater1state;
             } else if (sensorNr == 2) {
-                heaterState = "true";
+                heaterState = heater2state;
             } else if (sensorNr == 3) {
-                heaterState = "false";
+                heaterState = heater3state;
             }
         }
 
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", heaterState);
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", heaterState ? "true" : "false");
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
     });
 
     server.on("/liquid-status", HTTP_GET, [](AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", "true");
+        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
         response->addHeader("Access-Control-Allow-Origin", "*");
         request->send(response);
     });
 
     server.on("/mode-status", HTTP_GET, [](AsyncWebServerRequest *request) {
         String currMode;
-        int tmp = 3;
-        if (tmp == 1) {
+        if (controlMode == CONTROL_MODE_NONE) {
             currMode = "none";
-        } else if (tmp == 2) {
+        } else if (controlMode == CONTROL_MODE_MANUAL) {
             currMode = "manual";
-        } else if (tmp == 3) {
+        } else if (controlMode == CONTROL_MODE_AUTO) {
             currMode = "auto";
         }
 

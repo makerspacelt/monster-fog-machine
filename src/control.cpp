@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <control.h>
 
 const int HEATER_1_VOLTAGE_IND_PIN = 5;
 const int HEATER_2_VOLTAGE_IND_PIN = 5;
@@ -6,22 +7,20 @@ const int HEATER_3_VOLTAGE_IND_PIN = 5;
 const int FLUID_TANK_FLOAT_PIN = 5;
 const int MACHINE_CONTROL_RELAY_PIN = 2;
 
-const int CONTROL_MODE_NONE = 0;
-const int CONTROL_MODE_MANUAL = 0;
-const int CONTROL_MODE_AUTO = 0;
-
 int controlMode = CONTROL_MODE_NONE;
 
-float activationFrequency = 5 * 1000;
-float activationLength = 10 * 1000; 
+// AUTOMATIC CONTROL SETTINGS
+float waitingTime = 5 * 1000;
+float activationTime = 10 * 1000; 
 int activationCountSetting = 10;
 
-long controlTimer;
-
+// CURRENT MACHINE STATE VARIABLES
 bool heater1state = false;
 bool heater2state = false;
 bool heater3state = false;
 bool fluidTankState = false;
+
+long controlTimer;
 
 bool machineReady = false;
 int controlState = -1; // 0 -> machine is stopped, waiting for next activation (waiting stage), 1 -> machine is started (activation stage)
@@ -42,7 +41,12 @@ void updateFogMachineState() {
     fluidTankState = digitalRead(MACHINE_CONTROL_RELAY_PIN) == 1;
 
     machineReady = heater1state && heater2state && heater3state && fluidTankState;
+
     machineReady = true; //REMOVE AFTER DEBUG
+    fluidTankState = true;
+    heater1state = true;
+    heater2state = true;
+    heater3state = true;
 }
 
 void start_machine() {
@@ -81,7 +85,7 @@ void control_loop() {
 
         // Machine activation stage
         if (controlState == 1) {
-            if (millis() - controlTimer < activationLength) {
+            if (millis() - controlTimer < activationTime) {
                 // Activates machine
                 start_machine();
             } else {
@@ -95,7 +99,7 @@ void control_loop() {
 
         // Waiting for next activation stage
         if (controlState == 0) {
-            if (millis() - controlTimer < activationFrequency) {
+            if (millis() - controlTimer < waitingTime) {
                 // Stops machine
                 stop_machine();
             } else {
