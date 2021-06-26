@@ -31,25 +31,29 @@ function processFunc($func) {
 }
 
 function do_startManual() {
-    
+    // response: true if started, false if not
+    echo 'true';
 }
 
 function do_stopManual() {
-    
+    // response: true if stopped, false if not
+    echo 'true';
 }
 
 function do_startAuto() {
     // response: true if started, false if not
-    print_r($_GET);
+    echo 'true';
 }
 
 function do_stopAuto() {
-    
+    // response: true if stopped, false if not
+    echo 'true';
 }
 
 function do_heaterStatus() {
     // response: true if ready, false if heating
     echo (rand(0, 1) == 0 ? 'false' : 'true');
+    // return 'false';
 }
 
 function do_liquidStatus() {
