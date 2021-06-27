@@ -86,11 +86,19 @@ void setup_wifi_module() {
         if (request->hasParam("timeBfrSpray")) {
             String paramStr = request->getParam("timeBfrSpray")->value();
             float timeBfrSpray = atof(paramStr.c_str());
+            if (timeBfrSpray <= 0) {
+                request->send(200, "text/plain", "false");
+                return;
+            }
             waitingTime = timeBfrSpray * 60 * 1000;
         }
         if (request->hasParam("sprayTime")) {
             String paramStr = request->getParam("sprayTime")->value();
             float sprayTime = atof(paramStr.c_str());
+            if (sprayTime <= 0) {
+                request->send(200, "text/plain", "false");
+                return;
+            }
             activationTime = sprayTime * 1000;
         }
         request->send(200, "text/plain", "true");
