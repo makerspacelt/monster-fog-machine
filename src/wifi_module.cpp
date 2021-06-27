@@ -69,14 +69,14 @@ void setup_wifi_module() {
         Serial.println("Manual control mode started");
         controlMode = CONTROL_MODE_MANUAL;
 
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/stop-manual", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("Manual control mode stopped");
         controlMode = CONTROL_MODE_NONE;
 
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/start-auto", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -93,14 +93,14 @@ void setup_wifi_module() {
             float sprayTime = atof(paramStr.c_str());
             activationTime = sprayTime * 1000;
         }
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/stop-auto", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("Automatic control mode stopped");
         controlMode = CONTROL_MODE_NONE;
 
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/heater-status", HTTP_GET, [](AsyncWebServerRequest *request) {
