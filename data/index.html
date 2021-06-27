@@ -165,34 +165,34 @@
                 })(i);
             }
         }
-    
+        //---------------
         function getDelayTime() {
             getData("/get-delay-time", function(delayTime) {
                 document.getElementById("time-bfr-spray").value = delayTime;
                 var sprayTime = document.getElementById("spray-time");
             });
         }
-        
+        //---------------
         function getSprayTime() {
             getData("/get-spray-time", function(sprayTime) {
                 document.getElementById("spray-time").value = sprayTime;
             });
         }
-        
+        //---------------
         function getModeStatus() {
             getData("/mode-status", function(modeStatus) {
                 this.modeStatus = modeStatus;
                 updateUi();
             });
         }
-        
+        //---------------
         function getLiquidStatus() {
             getData("/liquid-status", function(liquidStatus) {
                 this.liquidStatus = liquidStatus;
                 getModeStatus();
             });
         }
-        
+        //---------------
         getLiquidStatus();
         procHeaterStatus();
         getDelayTime();
@@ -297,12 +297,12 @@
             autoBtn.disabled = !liquidStatusBool;
         }
     }
-    
+    //-------------------------------------------------
     getStatuses();
-
+    //---------------
     setInterval(function () {
         getStatuses();
     }, 5000);
-
+    //-------------------------------------------------
 </script>
 </html>
