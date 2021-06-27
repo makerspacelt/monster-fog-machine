@@ -140,8 +140,8 @@
                 callback && callback(this.responseText)
             }
         };
-        url = url.replace("?", "&");
-        url = 'espemu.php?f='+url;
+        // url = url.replace("?", "&");
+        // url = 'espemu.php?f='+url;
         xhttp.open("GET", url, true);
         xhttp.send();
     }
@@ -166,19 +166,6 @@
             }
         }
         //---------------
-        function getDelayTime() {
-            getData("/get-delay-time", function(delayTime) {
-                document.getElementById("time-bfr-spray").value = delayTime;
-                var sprayTime = document.getElementById("spray-time");
-            });
-        }
-        //---------------
-        function getSprayTime() {
-            getData("/get-spray-time", function(sprayTime) {
-                document.getElementById("spray-time").value = sprayTime;
-            });
-        }
-        //---------------
         function getModeStatus() {
             getData("/mode-status", function(modeStatus) {
                 this.modeStatus = modeStatus;
@@ -195,8 +182,19 @@
         //---------------
         getLiquidStatus();
         procHeaterStatus();
-        getDelayTime();
-        getSprayTime();
+    }
+    //-------------------------------------------------
+    function getDelayTime() {
+        getData("/get-delay-time", function(delayTime) {
+            document.getElementById("time-bfr-spray").value = delayTime;
+            var sprayTime = document.getElementById("spray-time");
+        });
+    }
+    //---------------
+    function getSprayTime() {
+        getData("/get-spray-time", function(sprayTime) {
+            document.getElementById("spray-time").value = sprayTime;
+        });
     }
     //-------------------------------------------------
     function manageManual() {
@@ -299,6 +297,8 @@
     }
     //-------------------------------------------------
     getStatuses();
+    getDelayTime();
+    getSprayTime();
     //---------------
     setInterval(function () {
         getStatuses();
