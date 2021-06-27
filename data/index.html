@@ -117,14 +117,16 @@
 </body>
 <script>
     /*
-        Backend funkcijos:
-            /start-manual -> pradeda purkšti, gražina true jei pavyko, false jei ne. Viduje reikia atlikti sąlygų check'us.
-            /stop-manual -> pabaigia purkšti, gražina true jei pavyko, false jei ne.
-            /start-auto -> pradeda automatinį veikimą, priima parametrus timeBfrSpray ir sprayTime, viduje atlieka tikrinimą. Gražina true/false.
-            /stop-auto -> baigia automatinį veikimą, gražina true/false.
-            /heater-status -> priima parametrą sensor (skaičiai 1, 2, 3) ir gražina to sensoriaus statusą true jei užkaito, false jei dar ne.
-            /liquid-status -> gražina atsakymą true jei yra skysčio, false jei nėra.
-            /mode-status -> gražina none, manual arba auto pagal tai koks rėžimas buvo paleistas.
+        Backend functions:
+            /start-manual -> starts manual spraying, return true on success, false on failure;
+            /stop-manual -> stops manual spraying, return true on success, false on failure;
+            /start-auto -> starts automatic spraying, accepts parameters timeBfrSpray and sprayTime, return true on success, false on failure;
+            /stop-auto -> stops automatic spraying, return true on success, false on failure;
+            /heater-status -> accepts parameter sensor (number 1, 2 or 3), returns true if done heating, false if not ready;
+            /liquid-status -> returns true if there is any liquid, false if the tank is empty;
+            /mode-status -> returns none, manual or auto indicating what mode was started;
+            /get-delay-time -> returns time before spray (minutes);
+            /get-spray-time -> returns spray duration time (seconds);
     */
 
     //-------------------------------------------------
@@ -272,6 +274,7 @@
             autoBtn.classList.add("btn-primary");
         }
         
+        /* if liquid is empty then update UI accordingly */
         if (!liquidStatusBool) {
             manualBtn.disabled = !liquidStatusBool;
             timeBfrSpray.disabled = !liquidStatusBool;
