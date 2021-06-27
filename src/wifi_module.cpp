@@ -145,6 +145,20 @@ void setup_wifi_module() {
         request->send(response);
     });
 
+    server.on("/get-delay-time", HTTP_GET, [](AsyncWebServerRequest *request) {
+        int time = waitingTime / 60 / 1000;
+        char numChar[10 + sizeof(char)];
+        sprintf(numChar, "%d", time);
+        request->send(200, "text/plain", numChar);
+    });
+
+    server.on("/get-spray-time", HTTP_GET, [](AsyncWebServerRequest *request) {
+        int time = activationTime / 1000;
+        char numChar[10 + sizeof(char)];
+        sprintf(numChar, "%d", time);
+        request->send(200, "text/plain", numChar);
+    });
+
     server.onNotFound([](AsyncWebServerRequest *request) {
         request->send(SPIFFS, "/index.html");
     });
