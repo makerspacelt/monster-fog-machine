@@ -126,16 +126,17 @@ void setup_wifi_module() {
             }
         }
 
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", heaterState ? "true" : "false");
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
+        // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", heaterState ? "true" : "false");
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        // request->send(response);
+        request->send(200, "text/plain", heaterState ? "true" : "false");
     });
 
     server.on("/liquid-status", HTTP_GET, [](AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
-        response->addHeader("Access-Control-Allow-Origin", "*");
-
-        request->send(response);
+        // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        // request->send(response);
+        request->send(200, "text/plain", fluidTankState ? "true" : "false");
     });
 
     server.on("/mode-status", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -148,9 +149,10 @@ void setup_wifi_module() {
             currMode = "auto";
         }
 
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", currMode);
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
+        // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", currMode);
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        // request->send(response);
+        request->send(200, "text/plain", currMode);
     });
 
     server.on("/get-delay-time", HTTP_GET, [](AsyncWebServerRequest *request) {
