@@ -69,14 +69,14 @@ void setup_wifi_module() {
         Serial.println("Manual control mode started");
         controlMode = CONTROL_MODE_MANUAL;
 
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/stop-manual", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("Manual control mode stopped");
         controlMode = CONTROL_MODE_NONE;
 
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/start-auto", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -86,21 +86,29 @@ void setup_wifi_module() {
         if (request->hasParam("timeBfrSpray")) {
             String paramStr = request->getParam("timeBfrSpray")->value();
             float timeBfrSpray = atof(paramStr.c_str());
+            if (timeBfrSpray <= 0) {
+                request->send(200, "text/plain", "false");
+                return;
+            }
             waitingTime = timeBfrSpray * 60 * 1000;
         }
         if (request->hasParam("sprayTime")) {
             String paramStr = request->getParam("sprayTime")->value();
             float sprayTime = atof(paramStr.c_str());
+            if (sprayTime <= 0) {
+                request->send(200, "text/plain", "false");
+                return;
+            }
             activationTime = sprayTime * 1000;
         }
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/stop-auto", HTTP_GET, [](AsyncWebServerRequest *request) {
         Serial.println("Automatic control mode stopped");
         controlMode = CONTROL_MODE_NONE;
 
-        request->send(200, "text/plain", "OK");
+        request->send(200, "text/plain", "true");
     });
 
     server.on("/heater-status", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -118,16 +126,17 @@ void setup_wifi_module() {
             }
         }
 
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", heaterState ? "true" : "false");
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
+        // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", heaterState ? "true" : "false");
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        // request->send(response);
+        request->send(200, "text/plain", heaterState ? "true" : "false");
     });
 
     server.on("/liquid-status", HTTP_GET, [](AsyncWebServerRequest *request) {
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
-        response->addHeader("Access-Control-Allow-Origin", "*");
-
-        request->send(response);
+        // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        // request->send(response);
+        request->send(200, "text/plain", fluidTankState ? "true" : "false");
     });
 
     server.on("/mode-status", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -140,9 +149,24 @@ void setup_wifi_module() {
             currMode = "auto";
         }
 
-        AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", currMode);
-        response->addHeader("Access-Control-Allow-Origin", "*");
-        request->send(response);
+        // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", currMode);
+        // response->addHeader("Access-Control-Allow-Origin", "*");
+        // request->send(response);
+        request->send(200, "text/plain", currMode);
+    });
+
+    server.on("/get-delay-time", HTTP_GET, [](AsyncWebServerRequest *request) {
+        int time = waitingTime / 60 / 1000;
+        char numChar[10 + sizeof(char)];
+        sprintf(numChar, "%d", time);
+        request->send(200, "text/plain", numChar);
+    });
+
+    server.on("/get-spray-time", HTTP_GET, [](AsyncWebServerRequest *request) {
+        int time = activationTime / 1000;
+        char numChar[10 + sizeof(char)];
+        sprintf(numChar, "%d", time);
+        request->send(200, "text/plain", numChar);
     });
 
     server.onNotFound([](AsyncWebServerRequest *request) {

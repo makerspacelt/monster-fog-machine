@@ -46,10 +46,10 @@
         </tr></table>
         <br/>
         <center>
-            <span id="ind-1" class="indicator indicator-empty"></span>
-            <span id="ind-2" class="indicator indicator-empty"></span>
-            <span id="ind-3" class="indicator indicator-empty"></span>
-            <div style="font-size: 20px">Liquid status: <span id="liq-stat" class="liquid-full" style="padding: 0px 10px 3px 10px"><b>GOOD</b></span></div>
+            <span id="ind-1" class="indicator indicator-full"></span>
+            <span id="ind-2" class="indicator indicator-full"></span>
+            <span id="ind-3" class="indicator indicator-full"></span>
+            <div style="font-size: 20px">Liquid status: <span id="liq-stat" class="liquid-empty" style="padding: 0px 10px 3px 10px"><b>EMPTY</b></span></div>
         </center>
         <br/><br/>
 
@@ -117,18 +117,22 @@
 </body>
 <script>
     /*
-        Backend funkcijos:
-            /start-manual -> pradeda purkšti, gražina true jei pavyko, false jei ne. Viduje reikia atlikti sąlygų check'us.
-            /stop-manual -> pabaigia purkšti, gražina true jei pavyko, false jei ne.
-            /start-auto -> pradeda automatinį veikimą, priima parametrus timeBfrSpray ir sprayTime, viduje atlieka tikrinimą. Gražina true/false.
-            /stop-auto -> baigia automatinį veikimą, gražina true/false.
-            /heater-status -> priima parametrą sensor (skaičiai 1, 2, 3) ir gražina to sensoriaus statusą true jei užkaito, false jei dar ne.
-            /liquid-status -> gražina atsakymą true jei yra skysčio, false jei nėra.
-            /mode-status -> gražina none, manual arba auto pagal tai koks rėžimas buvo paleistas.
+        Backend functions:
+            /start-manual -> starts manual spraying, return true on success, false on failure;
+            /stop-manual -> stops manual spraying, return true on success, false on failure;
+            /start-auto -> starts automatic spraying, accepts parameters timeBfrSpray and sprayTime, return true on success, false on failure;
+            /stop-auto -> stops automatic spraying, return true on success, false on failure;
+            /heater-status -> accepts parameter sensor (number 1, 2 or 3), returns true if done heating, false if not ready;
+            /liquid-status -> returns true if there is any liquid, false if the tank is empty;
+            /mode-status -> returns none, manual or auto indicating what mode was started;
+            /get-delay-time -> returns time before spray (minutes);
+            /get-spray-time -> returns spray duration time (seconds);
     */
 
+    //-------------------------------------------------
     var modeStatus = "none";
-
+    var liquidStatus = "false";
+    //-------------------------------------------------
     function getData(url, callback) {
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function() {
@@ -136,44 +140,78 @@
                 callback && callback(this.responseText)
             }
         };
-        //url = url.replace("?", "&");
-        //url = 'espemu.php?f='+url;
+        // url = url.replace("?", "&");
+        // url = 'espemu.php?f='+url;
         xhttp.open("GET", url, true);
         xhttp.send();
     }
-
+    //-------------------------------------------------
+    function getStatuses() {
+        function procHeaterStatus() {
+            for (var i = 1; i < 4; i++) {
+                (function(i) {
+                    getData("/heater-status?sensor="+i, function(heaterStatus) {
+                        // response: true if done heating, false if not ready
+                        console.log("heaterStatus => "+heaterStatus);
+                        var heaterInd = document.getElementById("ind-"+i);
+                        if (heaterStatus == "true") {
+                            heaterInd.classList.remove("indicator-full");
+                            heaterInd.classList.add("indicator-empty");
+                        } else {
+                            heaterInd.classList.remove("indicator-empty");
+                            heaterInd.classList.add("indicator-full");
+                        }
+                    });
+                })(i);
+            }
+        }
+        //---------------
+        function getModeStatus() {
+            getData("/mode-status", function(modeStatus) {
+                this.modeStatus = modeStatus;
+                updateUi();
+            });
+        }
+        //---------------
+        function getLiquidStatus() {
+            getData("/liquid-status", function(liquidStatus) {
+                this.liquidStatus = liquidStatus;
+                getModeStatus();
+            });
+        }
+        //---------------
+        getLiquidStatus();
+        procHeaterStatus();
+    }
+    //-------------------------------------------------
+    function getDelayTime() {
+        getData("/get-delay-time", function(delayTime) {
+            document.getElementById("time-bfr-spray").value = delayTime;
+            var sprayTime = document.getElementById("spray-time");
+        });
+    }
+    //---------------
+    function getSprayTime() {
+        getData("/get-spray-time", function(sprayTime) {
+            document.getElementById("spray-time").value = sprayTime;
+        });
+    }
+    //-------------------------------------------------
     function manageManual() {
-        var manualBtn = document.getElementById("manual-btn");
-        var timeBfrSpray = document.getElementById("time-bfr-spray");
-        var sprayTime = document.getElementById("spray-time");
-        var autoBtn = document.getElementById("automatic-btn");
         if (this.modeStatus == "none") {
-            getData("/stop-automatic");
-            manualBtn.innerHTML = "<b>STOP</b>";
-            manualBtn.classList.remove("btn-primary");
-            manualBtn.classList.add("btn-danger");
-            timeBfrSpray.disabled = true;
-            sprayTime.disabled = true;
-            autoBtn.disabled = true;
             getData("/start-manual");
             this.modeStatus = "manual";
+            updateUi();
         } else if (this.modeStatus == "manual") {
-            manualBtn.innerHTML = "<b>SPRAY</b>";
-            manualBtn.classList.remove("btn-danger");
-            manualBtn.classList.add("btn-primary");
-            timeBfrSpray.disabled = false;
-            sprayTime.disabled = false;
-            autoBtn.disabled = false;
             getData("/stop-manual");
             this.modeStatus = "none";
+            updateUi();
         }
     }
-    
+    //-------------------------------------------------
     function manageAuto() {
-        var manualBtn = document.getElementById("manual-btn");
         var timeBfrSpray = document.getElementById("time-bfr-spray");
         var sprayTime = document.getElementById("spray-time");
-        var autoBtn = document.getElementById("automatic-btn");
         if (this.modeStatus == "none") {
             var timeBfrSprayVal = timeBfrSpray.value;
             var sprayTimeVal = sprayTime.value;
@@ -181,136 +219,90 @@
                 alert("Wrong time values entered!");
                 return;
             }
-            manualBtn.disabled = true;
-            timeBfrSpray.disabled = true;
-            sprayTime.disabled = true;
-            autoBtn.innerHTML = "<b>STOP</b>";
-            autoBtn.classList.remove("btn-primary");
-            autoBtn.classList.add("btn-danger");
             getData("/start-auto?timeBfrSpray="+timeBfrSpray.value+"&sprayTime="+sprayTime.value);
             this.modeStatus = "auto";
+            updateUi();
         } else if (this.modeStatus == "auto") {
+            getData("/stop-auto");
+            this.modeStatus = "none";
+            updateUi();
+        }
+    }
+    //-------------------------------------------------
+    function updateUi() {
+        /* process liquid status first */
+        // response: true if there is liquid, false if empty
+        console.log("liquidStatus => "+this.liquidStatus);
+        var liquidInd = document.getElementById("liq-stat");
+        var liquidStatusBool = (this.liquidStatus == "true");
+        if (liquidStatusBool) {
+            liquidInd.classList.remove("liquid-empty");
+            liquidInd.classList.add("liquid-full");
+            liquidInd.innerHTML = "<b>GOOD</b>";
+        } else {
+            liquidInd.classList.remove("liquid-full");
+            liquidInd.classList.add("liquid-empty");
+            liquidInd.innerHTML = "<b>EMPTY</b>";
+        }
+        
+        /* now we process mode status */
+        // response: manual, automatic or none if nothing was started
+        console.log("modeStatus => "+this.modeStatus);
+        var manualBtn = document.getElementById("manual-btn");
+        var timeBfrSpray = document.getElementById("time-bfr-spray");
+        var sprayTime = document.getElementById("spray-time");
+        var autoBtn = document.getElementById("automatic-btn");
+        if (this.modeStatus == "manual") {
             manualBtn.disabled = false;
-            timeBfrSpray.disabled = false;
-            sprayTime.disabled = false;
+            timeBfrSpray.disabled = true;
+            sprayTime.disabled = true;
+            autoBtn.disabled = true;
             autoBtn.innerHTML = "<b>START</b>";
             autoBtn.classList.remove("btn-danger");
             autoBtn.classList.add("btn-primary");
-            getData("/stop-auto");
-            this.modeStatus = "none";
+            manualBtn.innerHTML = "<b>STOP</b>";
+            manualBtn.classList.remove("btn-primary");
+            manualBtn.classList.add("btn-danger");
+        } else if (this.modeStatus == "auto") {
+            manualBtn.disabled = true;
+            timeBfrSpray.disabled = true;
+            sprayTime.disabled = true;
+            manualBtn.innerHTML = "<b>SPRAY</b>";
+            manualBtn.classList.remove("btn-danger");
+            manualBtn.classList.add("btn-primary");
+            autoBtn.disabled = false;
+            autoBtn.innerHTML = "<b>STOP</b>";
+            autoBtn.classList.remove("btn-primary");
+            autoBtn.classList.add("btn-danger");
+        } else {
+            manualBtn.disabled = false;
+            timeBfrSpray.disabled = false;
+            sprayTime.disabled = false;
+            autoBtn.disabled = false;
+            manualBtn.innerHTML = "<b>SPRAY</b>";
+            manualBtn.classList.remove("btn-danger");
+            manualBtn.classList.add("btn-primary");
+            autoBtn.innerHTML = "<b>START</b>";
+            autoBtn.classList.remove("btn-danger");
+            autoBtn.classList.add("btn-primary");
         }
-    }
-
-    function procModeStatus() {
-        getData("/mode-status", function(modeStatus) {
-            // response: manual, automatic or none if nothing was started
-            // this.modeStatus = "none";
-            console.log("modeStatus => "+modeStatus);
-            this.modeStatus = modeStatus;
-            var manualBtn = document.getElementById("manual-btn");
-            var timeBfrSpray = document.getElementById("time-bfr-spray");
-            var sprayTime = document.getElementById("spray-time");
-            var autoBtn = document.getElementById("automatic-btn");
-            if (this.modeStatus == "manual") {
-                manualBtn.disabled = false;
-                timeBfrSpray.disabled = true;
-                sprayTime.disabled = true;
-                autoBtn.disabled = true;
-                manualBtn.innerHTML = "<b>STOP</b>";
-                manualBtn.classList.remove("btn-primary");
-                manualBtn.classList.add("btn-danger");
-            } else if (this.modeStatus == "auto") {
-                manualBtn.disabled = true;
-                timeBfrSpray.disabled = true;
-                sprayTime.disabled = true;
-                autoBtn.disabled = false;
-                autoBtn.innerHTML = "<b>STOP</b>";
-                autoBtn.classList.remove("btn-primary");
-                autoBtn.classList.add("btn-danger");
-            } else {
-                manualBtn.disabled = false;
-                timeBfrSpray.disabled = false;
-                sprayTime.disabled = false;
-                autoBtn.disabled = false;
-                manualBtn.innerHTML = "<b>SPRAY</b>";
-                manualBtn.classList.remove("btn-danger");
-                manualBtn.classList.add("btn-primary");
-                autoBtn.innerHTML = "<b>START</b>";
-                autoBtn.classList.remove("btn-danger");
-                autoBtn.classList.add("btn-primary");
-            }
-        });
-    }
-
-    function stopModes() {
-        // atsakymo gali ir nebūti
-        getData("/stop-manual");
-        getData("/stop-auto");
-    }
-       
-    function procHeaterStatus() {
-        for (var i = 1; i < 4; i++) {
-            (function(i) {
-                getData("/heater-status?sensor="+i, function(heaterStatus) {
-                    // atsakymas true jei užkaites, false jei kaista
-                    // var heaterStatus = "true";
-                    console.log("heaterStatus => "+heaterStatus);
-                    var heaterInd = document.getElementById("ind-"+i);
-                    if (heaterStatus == "true") {
-                        heaterInd.classList.remove("indicator-full");
-                        heaterInd.classList.add("indicator-empty");
-                    } else {
-                        heaterInd.classList.remove("indicator-empty");
-                        heaterInd.classList.add("indicator-full");
-                    }
-                });
-            })(i);
-        }
-    }
-
-    function procLiquidStatus() {
-        getData("/liquid-status", function(status) {
-            // response: true if there is liquid, false if empty
-            //var liquidStatus = true;
-            console.log("liquidStatus => "+status);
-            var liquidInd = document.getElementById("liq-stat");
-            var liquidStatus = (status == "true");
-            if (liquidStatus) {
-                liquidInd.classList.remove("liquid-empty");
-                liquidInd.classList.add("liquid-full");
-                liquidInd.innerHTML = "<b>GOOD</b>";
-            } else {
-                liquidInd.classList.remove("liquid-full");
-                liquidInd.classList.add("liquid-empty");
-                liquidInd.innerHTML = "<b>EMPTY</b>";
-                stopModes();
-            }
-            document.getElementById("manual-btn").disabled = !liquidStatus;
-            document.getElementById("time-bfr-spray").disabled = !liquidStatus;
-            document.getElementById("spray-time").disabled = !liquidStatus;
-            document.getElementById("automatic-btn").disabled = !liquidStatus;
-        });
         
+        /* if liquid is empty then update UI accordingly */
+        if (!liquidStatusBool) {
+            manualBtn.disabled = !liquidStatusBool;
+            timeBfrSpray.disabled = !liquidStatusBool;
+            sprayTime.disabled = !liquidStatusBool;
+            autoBtn.disabled = !liquidStatusBool;
+        }
     }
-    
-    function initPage() {
-        procModeStatus();
-        procHeaterStatus();
-        procLiquidStatus();
-    }
-    
-    initPage();
-    
-    /*setInterval(function () {
-        procModeStatus();
-    }, 4900);
-    
+    //-------------------------------------------------
+    getStatuses();
+    getDelayTime();
+    getSprayTime();
+    //---------------
     setInterval(function () {
-        procHeaterStatus();
+        getStatuses();
     }, 5000);
-    
-    setInterval(function () {
-        procLiquidStatus();
-    }, 5100);*/
+    //-------------------------------------------------
 </script>
 </html>

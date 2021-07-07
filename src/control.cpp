@@ -10,7 +10,7 @@ const int MACHINE_CONTROL_RELAY_PIN = 4;
 int controlMode = CONTROL_MODE_NONE;
 
 // AUTOMATIC CONTROL SETTINGS
-float waitingTime = 5 * 1000;
+float waitingTime = 5 * 60 * 1000;
 float activationTime = 10 * 1000; 
 int activationCountSetting = 10;
 

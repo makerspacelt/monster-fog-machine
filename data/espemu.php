@@ -23,6 +23,10 @@ function processFunc($func) {
          do_heaterStatus();
      } else if ($func == '/liquid-status') {
          do_liquidStatus();
+    } else if ($func == '/get-delay-time') {
+         do_delayTime();
+    } else if ($func == '/get-spray-time') {
+         do_sprayTime();
      } else if ($func == '/mode-status') {
          do_modeStatus();
      } else {
@@ -61,9 +65,19 @@ function do_liquidStatus() {
     echo 'true';
 }
 
+function do_delayTime() {
+    // response: number in minutes
+    echo '9';
+}
+
+function do_sprayTime() {
+    // response: number in seconds
+    echo '19';
+}
+
 function do_modeStatus() {
     // response: none, manual or auto
-    echo 'auto';
+    echo 'none';
 }
 
 ?>
