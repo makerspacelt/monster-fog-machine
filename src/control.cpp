@@ -1,11 +1,11 @@
 #include <Arduino.h>
 #include <control.h>
 
-const int HEATER_1_VOLTAGE_IND_PIN = 5;
-const int HEATER_2_VOLTAGE_IND_PIN = 5;
-const int HEATER_3_VOLTAGE_IND_PIN = 5;
-const int FLUID_TANK_FLOAT_PIN = 5;
-const int MACHINE_CONTROL_RELAY_PIN = 2;
+const int HEATER_1_VOLTAGE_IND_PIN = 33;
+const int HEATER_2_VOLTAGE_IND_PIN = 25;
+const int HEATER_3_VOLTAGE_IND_PIN = 26;
+const int FLUID_TANK_FLOAT_PIN = 27;
+const int MACHINE_CONTROL_RELAY_PIN = 4;
 
 int controlMode = CONTROL_MODE_NONE;
 
@@ -43,10 +43,10 @@ void updateFogMachineState() {
     machineReady = heater1state && heater2state && heater3state && fluidTankState;
 
     machineReady = true; //REMOVE AFTER DEBUG
-    fluidTankState = true;
-    heater1state = true;
-    heater2state = true;
-    heater3state = true;
+    //fluidTankState = true;
+    //heater1state = true;
+    //heater2state = true;
+    //heater3state = true;
 }
 
 void start_machine() {
@@ -110,11 +110,12 @@ void control_loop() {
             }
         }
 
-        if (activationCounter > activationCountSetting) {
-            // Finishes the automatic control
-            // Variables are resetted in the next control loop
-            controlMode = CONTROL_MODE_NONE;
-        }
+        // COUNTER IS NOT IMPLEMENTED IN UI
+        // if (activationCounter > activationCountSetting) {
+        //     // Finishes the automatic control
+        //     // Variables are resetted in the next control loop
+        //     controlMode = CONTROL_MODE_NONE;
+        // }
     } if (controlMode == CONTROL_MODE_MANUAL) {
         // Activates machine
         // State validation is already performed at this point
