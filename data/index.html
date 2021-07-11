@@ -132,6 +132,7 @@
     //-------------------------------------------------
     var modeStatus = "none";
     var liquidStatus = "false";
+    var heaterStatus = [false, false, false];
     //-------------------------------------------------
     function getData(url, callback) {
         var xhttp = new XMLHttpRequest();
@@ -157,9 +158,11 @@
                         if (heaterStatus == "true") {
                             heaterInd.classList.remove("indicator-full");
                             heaterInd.classList.add("indicator-empty");
+                            this.heaterStatus[i-1] = true;
                         } else {
                             heaterInd.classList.remove("indicator-empty");
                             heaterInd.classList.add("indicator-full");
+                            this.heaterStatus[i-1] = false;
                         }
                     });
                 })(i);
@@ -293,6 +296,13 @@
             timeBfrSpray.disabled = !liquidStatusBool;
             sprayTime.disabled = !liquidStatusBool;
             autoBtn.disabled = !liquidStatusBool;
+        }
+        
+        // only if all heaters are ready
+        if (this.heaterStatus[0] && this.heaterStatus[1] && this.heaterStatus[2]) {
+            manualBtn.disabled = false;
+        } else {
+            manualBtn.disabled = true;
         }
     }
     //-------------------------------------------------
