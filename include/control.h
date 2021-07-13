@@ -16,9 +16,9 @@ extern float activationTime;
 extern int activationCountSetting;
 
 // CURRENT MACHINE STATE VARIABLES
-extern bool heater1state;
-extern bool heater2state;
-extern bool heater3state;
-extern bool fluidTankState;
+extern bool heater_1_ready;
+extern bool heater_2_ready;
+extern bool heater_3_ready;
+extern bool fluid_not_empty;
 
 #endif

@@ -118,11 +118,11 @@ void setup_wifi_module() {
             int sensorNr = atoi(sensorNrStr.c_str());
             
             if (sensorNr == 1) {
-                heaterState = heater1state;
+                heaterState = heater_1_ready;
             } else if (sensorNr == 2) {
-                heaterState = heater2state;
+                heaterState = heater_2_ready;
             } else if (sensorNr == 3) {
-                heaterState = heater3state;
+                heaterState = heater_3_ready;
             }
         }
 
@@ -136,7 +136,7 @@ void setup_wifi_module() {
         // AsyncWebServerResponse *response = request->beginResponse(200, "text/plain", fluidTankState ? "true" : "false");
         // response->addHeader("Access-Control-Allow-Origin", "*");
         // request->send(response);
-        request->send(200, "text/plain", fluidTankState ? "true" : "false");
+        request->send(200, "text/plain", fluid_not_empty ? "true" : "false");
     });
 
     server.on("/mode-status", HTTP_GET, [](AsyncWebServerRequest *request) {
