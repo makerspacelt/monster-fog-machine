@@ -56,8 +56,11 @@ function do_stopAuto() {
 
 function do_heaterStatus() {
     // response: true if ready, false if heating
-    echo (rand(0, 1) == 0 ? 'false' : 'true');
-    // return 'false';
+    switch ($_GET['sensor']) {
+        case '1': echo 'true'; break;
+        case '2': echo 'false'; break;
+        case '3': echo 'true'; break;
+    }
 }
 
 function do_liquidStatus() {
