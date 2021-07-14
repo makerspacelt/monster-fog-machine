@@ -60,7 +60,7 @@ void control_loop() {
     updateFogMachineState();
     
     // Checking if timer control is activated and all machine requirements are met
-    if(controlMode == CONTROL_MODE_NONE) {
+    if(controlMode == CONTROL_MODE_NONE || !fluid_not_empty) {
         // Stops the automatic and manual control of the machine and resets control variables to undefined
         
         stop_machine();

@@ -302,7 +302,9 @@
         if (this.heaterStatus[0] && this.heaterStatus[1] && this.heaterStatus[2]) {
             manualBtn.disabled = false;
         } else {
-            manualBtn.disabled = true;
+            if (this.modeStatus == "none") {
+                manualBtn.disabled = true;
+            }
         }
     }
     //-------------------------------------------------
@@ -312,7 +314,7 @@
     //---------------
     setInterval(function () {
         getStatuses();
-    }, 5000);
+    }, 1000);
     //-------------------------------------------------
 </script>
 </html>
