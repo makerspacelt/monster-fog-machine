@@ -125,6 +125,6 @@ void control_manual() {
         start_machine();
     } else {
         // In the next cycle machine is stopped by the main method
-        controlMode == CONTROL_MODE_NONE;
+        controlMode = CONTROL_MODE_NONE;
     }
 }
