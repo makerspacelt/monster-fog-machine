@@ -91,6 +91,7 @@ void loop() {
     }
 
     if (halt) {
+        if (digitalRead(SSR_PIN) != LOW) digitalWrite(SSR_PIN, LOW);
         if ((millis() - lastMillis) >= 1000) {
             lastMillis = millis();
             digitalWrite(ERR_LED_PIN, !digitalRead(ERR_LED_PIN));
@@ -105,7 +106,6 @@ void loop() {
             Serial.print(blockTemp);
             updateTempOnScreen(blockTemp);
             if (blockTemp >= HEATER_CRITICAL_TEMP) {
-                digitalWrite(SSR_PIN, LOW);
                 lcd.clear();
                 lcd.setCursor(3, 0);
                 lcd.print("OVER-HEAT");
@@ -124,7 +124,6 @@ void loop() {
             }
         } else {
             // thermocoupler not attached!
-            digitalWrite(SSR_PIN, LOW);
             lcd.clear();
             lcd.setCursor(2, 0);
             lcd.print("CHECK THRMCP");
