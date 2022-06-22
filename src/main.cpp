@@ -5,7 +5,7 @@
 #include <EEPROM.h>
 
 #define SSR_PIN D3 // Solid State Relay
-#define BTN_PIN D7
+#define PUMP_BTN_PIN D7
 #define ERR_LED_PIN D0
 #define THERMO_DO D6
 #define THERMO_CS D8
@@ -41,7 +41,7 @@ void setup() {
 
     pinMode(SSR_PIN, OUTPUT);
     pinMode(ERR_LED_PIN, OUTPUT);
-    pinMode(BTN_PIN, INPUT_PULLUP);
+    pinMode(PUMP_BTN_PIN, INPUT_PULLUP);
 
     digitalWrite(SSR_PIN, LOW);
 
@@ -50,7 +50,7 @@ void setup() {
     lcd.backlight();
 
     // reset self-destruction status
-    if (digitalRead(BTN_PIN) == LOW) {
+    if (digitalRead(PUMP_BTN_PIN) == LOW) {
         EEPROM.write(0, 0);
         EEPROM.commit();
     } else {
@@ -86,7 +86,7 @@ void setup() {
 
 void loop() {
     // always allow to spray in case we need to cool it down quickly
-    if (digitalRead(BTN_PIN) == LOW) {
+    if (digitalRead(PUMP_BTN_PIN) == LOW) {
         
     }
 
