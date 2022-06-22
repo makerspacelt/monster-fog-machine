@@ -116,7 +116,7 @@ void loop() {
             } else if (blockTemp >= HEATER_STOP_TEMP) {
                 digitalWrite(SSR_PIN, LOW);
                 lcd.setCursor(4, 1);
-                lcd.print("Cooling");
+                lcd.print("Ready");
             } else if (blockTemp <= HEATER_START_TEMP) {
                 digitalWrite(SSR_PIN, HIGH);
                 lcd.setCursor(4, 1);
