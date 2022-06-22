@@ -6,7 +6,7 @@
 
 #define SSR_PIN D3 // Solid State Relay
 #define BTN_PIN D7
-#define ERR_LED_PIN 10
+#define ERR_LED_PIN D0
 #define THERMO_DO D6
 #define THERMO_CS D8
 #define THERMO_CLK D5
