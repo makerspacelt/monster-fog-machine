@@ -13,7 +13,7 @@
 #define HEATER_CRITICAL_TEMP 150.0 // when to halt everything
 #define HEATER_STOP_TEMP 100.0 // when to shut off the heaters
 #define HEATER_START_TEMP 60.0 // below this number we start the heaters
-#define HEATER_POLL_TIME 500 // how often to check block temp
+#define HEATER_POLL_TIME 1000 // how often to check block temp
 
 MAX6675 thermo(THERMO_CLK, THERMO_CS, THERMO_DO);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
