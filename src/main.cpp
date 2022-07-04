@@ -2,12 +2,15 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <max6675.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 #define SSR_PIN D3 // Solid State Relay
 #define ERR_LED_PIN D0
-#define THERMO_SO D6
-#define THERMO_CS D8
-#define THERMO_SCK D5
+#define TEMP_PIN D7 // DS18B20 sensor
+#define THERMO_SO D6 // for Thermocoupler reading
+#define THERMO_CS D8 // for Thermocoupler reading
+#define THERMO_SCK D5 // for Thermocoupler reading
 #define HEATER_CRITICAL_TEMP 150.0 // when to halt everything
 #define HEATER_STOP_TEMP 100.0 // when to shut off the heaters
 #define HEATER_START_TEMP 60.0 // below this number we start the heaters
@@ -15,16 +18,18 @@
 
 MAX6675 thermo(THERMO_SCK, THERMO_CS, THERMO_SO);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
+OneWire tempOw(TEMP_PIN);
+DallasTemperature dtSensor(&tempOw);
 bool halt;
 unsigned long lastMillis;
 
-void updateTempOnScreen(float blockTemp) {
+void updateTempOnScreen(float blockTemp, float caseTemp) {
     lcd.setCursor(0, 0);
     lcd.print((int)blockTemp);
     lcd.print((char)223);
     lcd.print("C");
     lcd.print("      ");
-    lcd.print((int)blockTemp);
+    lcd.print((int)caseTemp);
     lcd.print((char)223);
     lcd.print("C");
     lcd.print("  ");
@@ -39,6 +44,7 @@ void setup() {
     pinMode(ERR_LED_PIN, OUTPUT);
 
     digitalWrite(SSR_PIN, LOW);
+    dtSensor.begin();
 
     lcd.init();
     lcd.clear();
@@ -47,10 +53,18 @@ void setup() {
     // check initial temperature before anything else
     // shut down if the block is nearing self-destruction
     float blockTemp = thermo.readCelsius();
+    dtSensor.requestTemperatures();
+    float caseTemp = dtSensor.getTempCByIndex(0);
     if (isnan(blockTemp)) {
         // thermocoupler not attached!
         lcd.setCursor(2, 0);
         lcd.print("CHECK THRMCP");
+        halt = true;
+        return;
+    } else if (caseTemp != DEVICE_DISCONNECTED_C) {
+        // case temp sensor not attached!
+        lcd.setCursor(2, 0);
+        lcd.print("CHECK SENSOR");
         halt = true;
         return;
     } else if (blockTemp >= HEATER_CRITICAL_TEMP) {
@@ -74,9 +88,12 @@ void loop() {
     if ((millis() - lastMillis) >= HEATER_POLL_TIME) {
         lastMillis = millis();
         float blockTemp = thermo.readCelsius();
+        dtSensor.requestTemperatures();
+        float caseTemp = dtSensor.getTempCByIndex(0);
+        Serial.println(caseTemp);
         if (!isnan(blockTemp)) {
             // Serial.print(blockTemp);
-            updateTempOnScreen(blockTemp);
+            updateTempOnScreen(blockTemp, caseTemp);
             if (blockTemp >= HEATER_CRITICAL_TEMP) {
                 lcd.clear();
                 lcd.setCursor(3, 0);
