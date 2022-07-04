@@ -61,18 +61,18 @@ void setup() {
     float caseTemp = dtSensor.getTempCByIndex(0);
     if (isnan(blockTemp)) {
         // thermocoupler not attached!
-        lcd.setCursor(2, 0);
+        lcd.setCursor(2, 1);
         lcd.print("CHECK THRMCP");
         halt = true;
         return;
     } else if (caseTemp == DEVICE_DISCONNECTED_C) {
         // case temp sensor not attached!
-        lcd.setCursor(2, 0);
+        lcd.setCursor(2, 1);
         lcd.print("CHECK SENSOR");
         halt = true;
         return;
     } else if (blockTemp >= HEATER_CRITICAL_TEMP) {
-        lcd.setCursor(3, 0);
+        lcd.setCursor(3, 1);
         lcd.print("OVER-HEAT");
         halt = true;
         return;
@@ -100,7 +100,7 @@ void loop() {
             updateTempOnScreen(blockTemp, caseTemp);
             if (blockTemp >= HEATER_CRITICAL_TEMP) {
                 lcd.clear();
-                lcd.setCursor(3, 0);
+                lcd.setCursor(3, 1);
                 lcd.print("OVER-HEAT");
                 halt = true;
                 return;
@@ -116,18 +116,17 @@ void loop() {
             }
         } else if (caseTemp == DEVICE_DISCONNECTED_C) {
             // case temp sensor not attached!
-            lcd.setCursor(2, 0);
+            lcd.setCursor(2, 1);
             lcd.print("CHECK SENSOR");
             halt = true;
             return;
         } else {
             // thermocoupler not attached!
             lcd.clear();
-            lcd.setCursor(2, 0);
+            lcd.setCursor(2, 1);
             lcd.print("CHECK THRMCP");
             halt = true;
             return;
         }
     }
-
 }
