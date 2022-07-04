@@ -24,16 +24,20 @@ bool halt;
 unsigned long lastMillis;
 
 void updateTempOnScreen(float blockTemp, float caseTemp) {
+    String res;
+    res += (int)blockTemp;
+    res += (char)223;
+    res += "C";
+    if (res.length() < 5) res += " ";
     lcd.setCursor(0, 0);
-    lcd.print((int)blockTemp);
-    lcd.print((char)223);
-    lcd.print("C");
-    lcd.print("      ");
-    lcd.print((int)caseTemp);
-    lcd.print((char)223);
-    lcd.print("C");
-    lcd.print("  ");
-    
+    lcd.print(res.c_str());
+    res = "";
+    res += (int)caseTemp;
+    res += (char)223;
+    res += "C";
+    if (res.length() < 5) res += " ";
+    lcd.setCursor(11, 0);
+    lcd.print(res.c_str());
 }
 
 void setup() {
@@ -61,7 +65,7 @@ void setup() {
         lcd.print("CHECK THRMCP");
         halt = true;
         return;
-    } else if (caseTemp != DEVICE_DISCONNECTED_C) {
+    } else if (caseTemp == DEVICE_DISCONNECTED_C) {
         // case temp sensor not attached!
         lcd.setCursor(2, 0);
         lcd.print("CHECK SENSOR");
@@ -103,12 +107,19 @@ void loop() {
             } else if (blockTemp >= HEATER_STOP_TEMP) {
                 digitalWrite(SSR_PIN, LOW);
                 lcd.setCursor(4, 1);
+                lcd.print("       ");
                 lcd.print("Ready");
             } else if (blockTemp <= HEATER_START_TEMP) {
                 digitalWrite(SSR_PIN, HIGH);
                 lcd.setCursor(4, 1);
                 lcd.print("Heating");
             }
+        } else if (caseTemp == DEVICE_DISCONNECTED_C) {
+            // case temp sensor not attached!
+            lcd.setCursor(2, 0);
+            lcd.print("CHECK SENSOR");
+            halt = true;
+            return;
         } else {
             // thermocoupler not attached!
             lcd.clear();
