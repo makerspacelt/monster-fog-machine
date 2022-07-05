@@ -13,7 +13,7 @@
 #define THERMO_SCK D5 // for Thermocoupler reading
 #define HEATER_CRITICAL_TEMP 150.0 // when to halt everything
 #define HEATER_STOP_TEMP 100.0 // when to shut off the heaters
-#define HEATER_START_TEMP 60.0 // below this number we start the heaters
+#define HEATER_START_TEMP 80.0 // below this number we start the heaters
 #define HEATER_POLL_TIME 1000 // how often to check block temp
 
 MAX6675 thermo(THERMO_SCK, THERMO_CS, THERMO_SO);
@@ -22,6 +22,7 @@ OneWire tempOw(TEMP_PIN);
 DallasTemperature dtSensor(&tempOw);
 bool halt;
 unsigned long lastMillis;
+unsigned long errLastMillis;
 
 void updateTempOnScreen(float blockTemp, float caseTemp) {
     String res;
@@ -82,11 +83,10 @@ void setup() {
 void loop() {
     if (halt) {
         if (digitalRead(SSR_PIN) != LOW) digitalWrite(SSR_PIN, LOW);
-        if ((millis() - lastMillis) >= 1000) {
-            lastMillis = millis();
+        if ((millis() - errLastMillis) >= 1000) {
+            errLastMillis = millis();
             digitalWrite(ERR_LED_PIN, !digitalRead(ERR_LED_PIN));
         }
-        return;
     }
 
     if ((millis() - lastMillis) >= HEATER_POLL_TIME) {
@@ -95,31 +95,32 @@ void loop() {
         dtSensor.requestTemperatures();
         float caseTemp = dtSensor.getTempCByIndex(0);
         Serial.println(caseTemp);
-        if (!isnan(blockTemp)) {
-            // Serial.print(blockTemp);
-            updateTempOnScreen(blockTemp, caseTemp);
-            if (blockTemp >= HEATER_CRITICAL_TEMP) {
-                lcd.clear();
-                lcd.setCursor(3, 1);
-                lcd.print("OVER-HEAT");
-                halt = true;
-                return;
-            } else if (blockTemp >= HEATER_STOP_TEMP) {
-                digitalWrite(SSR_PIN, LOW);
-                lcd.setCursor(4, 1);
-                lcd.print("       ");
-                lcd.print("Ready");
-            } else if (blockTemp <= HEATER_START_TEMP) {
-                digitalWrite(SSR_PIN, HIGH);
-                lcd.setCursor(4, 1);
-                lcd.print("Heating");
-            }
-        } else if (caseTemp == DEVICE_DISCONNECTED_C) {
+
+        if (caseTemp == DEVICE_DISCONNECTED_C) {
             // case temp sensor not attached!
             lcd.setCursor(2, 1);
             lcd.print("CHECK SENSOR");
             halt = true;
-            return;
+        }
+
+        if (!isnan(blockTemp)) {
+            // Serial.print(blockTemp);
+            updateTempOnScreen(blockTemp, caseTemp);
+            if (!halt && (blockTemp >= HEATER_CRITICAL_TEMP)) {
+                lcd.setCursor(3, 1);
+                lcd.print("OVER-HEAT");
+                halt = true;
+                return;
+            } else if (!halt && ((blockTemp >= HEATER_STOP_TEMP) || (blockTemp >= HEATER_START_TEMP))) {
+                digitalWrite(SSR_PIN, LOW);
+                lcd.setCursor(4, 1);
+                lcd.setCursor(4, 1);
+                lcd.print("Ready  ");
+            } else if (!halt && (blockTemp <= HEATER_START_TEMP)) {
+                digitalWrite(SSR_PIN, HIGH);
+                lcd.setCursor(4, 1);
+                lcd.print("Heating");
+            }
         } else {
             // thermocoupler not attached!
             lcd.clear();
