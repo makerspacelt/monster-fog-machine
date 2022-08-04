@@ -1,0 +1,5 @@
+Refaktorinti kodą, padaryti abejų temp. skaitymą ir rodymą atskirai, ne vienu metu.
+
+Padaryti automatinį pūtimą - prietaisą su pulteliu kuris veiktų vietoje mygtuko.
+
+Pagaminti antrą kaitinimo bloką.
