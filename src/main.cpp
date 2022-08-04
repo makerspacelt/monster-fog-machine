@@ -16,7 +16,7 @@
 #define HEATER_STOP_TEMP 300.0 // when to shut off the heaters
 #define HEATER_START_TEMP 290.0 // below this number we start the heaters
 #define HEATER_NOT_READY_TEMP 250.0 // below this number we notify the user to stop
-#define HEATER_POLL_TIME 1000 // how often to check block temp
+#define HEATER_POLL_TIME 4000 // how often to check temp
 
 MAX6675 thermo(THERMO_SCK, THERMO_CS, THERMO_SO);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -95,6 +95,8 @@ void setup() {
     } else if (!halt && (blockTemp >= HEATER_STOP_TEMP)) {
         digitalWrite(READY_LED_PIN, LOW);
     }
+
+    if (!halt) updateTempOnScreen(blockTemp, caseTemp);
 }
 
 void loop() {
