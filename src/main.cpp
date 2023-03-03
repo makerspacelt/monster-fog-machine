@@ -42,6 +42,7 @@ void showSplashScreen() {
     lcd.setCursor(1, 1);
     lcd.print("makerspace.lt");
     delay(1500);
+    lcd.clear();
 }
 
 String formatTemp(float temp) {
@@ -86,12 +87,9 @@ void setup() {
     float blockTemp = thermo.readCelsius();
     pollReads = 0;
     float caseTemp;
-    do {
-        dtSensor.requestTemperatures();
-        caseTemp = dtSensor.getTempCByIndex(0);
-        pollReads++;
-    } while ((pollReads < TEMP_POLL_RETRY_COUNT) || (caseTemp != DEVICE_DISCONNECTED_C));
-    if (isnan(blockTemp)) {
+    dtSensor.requestTemperatures();
+    caseTemp = dtSensor.getTempCByIndex(0);    
+    if (isnan(blockTemp) && (blockTemp != 0)) {
         // thermocoupler not attached!
         lcd.clear();
         lcd.setCursor(2, 1);
@@ -130,6 +128,10 @@ void setup() {
     dtSensor.setWaitForConversion(false);
     dtSensor.requestTemperatures();
     lastCasePollMillis = millis();
+    if (!halt) {
+        updateCaseTempOnScreen(caseTemp);
+        updateBlockTempOnScreen(blockTemp);
+    }
 }
 
 void loop() {
@@ -146,6 +148,7 @@ void loop() {
         float caseTemp = dtSensor.getTempCByIndex(0);
         Serial.print("Case temp: ");
         Serial.println(caseTemp);
+        if (!halt) updateCaseTempOnScreen(caseTemp);
         if (caseTemp == DEVICE_DISCONNECTED_C) {
             pollReads++;
             if (pollReads == TEMP_POLL_RETRY_COUNT) {
@@ -153,12 +156,12 @@ void loop() {
                 lcd.setCursor(2, 1);
                 lcd.print("CHECK SENSOR");
                 digitalWrite(STATUS_LED_PIN, HIGH);
-                Serial.println("CHECK SENSOR");
                 halt = true;
             }
+            Serial.println("CHECK SENSOR");
         } else {
             pollReads = 0;
-            updateBlockTempOnScreen(caseTemp);
+            if (!halt) updateCaseTempOnScreen(caseTemp);
         }
         dtSensor.requestTemperatures();
         lastCasePollMillis = millis();
@@ -166,13 +169,12 @@ void loop() {
 
     // process block temperature
     if ((millis() - lastHeaterPollMillis) >= HEATER_POLL_DELAY) {
-        lastHeaterPollMillis = millis();
         float blockTemp = thermo.readCelsius();
         
-        if (!isnan(blockTemp)) {
+        if (!isnan(blockTemp) && (blockTemp != 0)) {
             Serial.print("Block temp: ");
             Serial.println(blockTemp);
-            updateBlockTempOnScreen(blockTemp);
+            if (!halt) updateBlockTempOnScreen(blockTemp);
             if (!halt && (blockTemp >= HEATER_CRITICAL_TEMP)) {
                 lcd.setCursor(3, 1);
                 lcd.print("OVER-HEAT");
@@ -196,13 +198,16 @@ void loop() {
             }
         } else {
             // thermocoupler not attached!
-            lcd.clear();
-            lcd.setCursor(2, 1);
-            lcd.print("CHECK THRMCP");
-            digitalWrite(STATUS_LED_PIN, HIGH);
+            if (!halt) {
+                lcd.clear();
+                lcd.setCursor(2, 1);
+                lcd.print("CHECK THRMCP");
+                digitalWrite(STATUS_LED_PIN, HIGH);
+                halt = true;
+            }
             Serial.println("CHECK THRMCP");
-            halt = true;
             return;
         }
+        lastHeaterPollMillis = millis();
     }
 }
