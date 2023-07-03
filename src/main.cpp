@@ -19,9 +19,9 @@
 #define THERMO_CS D8
 #define THERMO_SCK D5
 //------
-#define HEATER_CRITICAL_TEMP 300.0 // when to halt everything for emergency shutdown
-#define HEATER_STOP_TEMP 200.0 // when to shut off the heaters
-#define HEATER_START_TEMP 190.0 // below this number we start the heaters
+#define HEATER_CRITICAL_TEMP 350.0 // when to halt everything for emergency shutdown
+#define HEATER_STOP_TEMP 300.0 // when to shut off the heaters
+#define HEATER_START_TEMP 290.0 // below this number we start the heaters
 #define HEATER_NOT_READY_TEMP 150.0 // below this number we notify the user to stop
 #define HEATER_POLL_DELAY 1000 // how often to check the block temp
 //===================================================
